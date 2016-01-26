@@ -9,6 +9,8 @@
 import Foundation
 import FBSDKLoginKit
 import FBSDKShareKit
+import TwitterKit
+
 
 //FB login App Events and Notifications
 struct SLTAppEventsAndNotifications {
@@ -422,4 +424,49 @@ struct SLTFacebookShareProvider : SLTShareProvider {
         FBSDKMessageDialog.showWithContent(content, delegate: sharingDelegateImpl)
     }
     
+}
+
+struct SLTTwitterShareProvider  : SLTShareProvider {
+    
+    weak var delegate : SLTShareProviderDelegate?
+    
+    init(withDelegate delegate: SLTShareProviderDelegate?) {
+        
+        self.delegate = delegate
+    }
+    
+    func share(button:UIView , text : String , url: NSURL? = nil, image:UIImage? = nil) {
+        
+        let composer = TWTRComposer()
+        
+        composer.setText(text)
+        composer.setURL(url)
+        
+        if let image = image {
+            composer.setImage(image)
+        }
+        
+        if let controller = SLTInternals.viewControllerforView(button) {
+        
+            // Called from a UIViewController
+        composer.showFromViewController(controller) { result in
+            if (result == .Cancelled) {
+                print("Tweet composition cancelled")
+            
+                self.delegate?.providerDidCancel(self)
+            }
+            else {
+                self.delegate?.provider(self, didCompleteWithResults: SLTShareResult(postID: ""))
+            }
+        }
+    }
+    }
+}
+
+extension SLTTwitterShareProvider {
+    
+    var name : String {
+        
+        return SLTInternals.twitterProviderName
+    }
 }

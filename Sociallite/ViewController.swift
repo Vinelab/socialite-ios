@@ -15,11 +15,37 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
         // Dispose of any resources that can be recreated.
+    
+        
+//        let twitterSharer = SLTTwitterShareProvider(withDelegate: self)
+        
+//        twitterSharer.share(self.view, text: "Test tweet")
     }
 
 
+}
+
+extension ViewController : SLTShareProviderDelegate {
+    
+    func provider(provider: SLTShareProvider, didCompleteWithResults results: SLTShareResult) {
+        
+        
+        print("p: \(provider)  r: \(results)")
+    }
+    
+    
+    func provider(provider: SLTShareProvider, didFailWithError error: NSError) {
+     
+        print("p: \(provider)  e: \(error)")
+    }
+    
+    
+    func providerDidCancel(sharer: SLTShareProvider) {
+        
+        print("providerDidCancel")
+    }
 }
 
