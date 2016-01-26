@@ -7,5 +7,9 @@ target 'Sociallite' do
 pod 'FBSDKCoreKit'
 pod 'FBSDKLoginKit'
 pod 'FBSDKShareKit'
+
+pod 'Fabric'
+pod 'TwitterKit'
+pod 'TwitterCore'
 end
 

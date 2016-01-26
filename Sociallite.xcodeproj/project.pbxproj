@@ -104,6 +104,7 @@
 				6286FBD11C577C2B0000E7E6 /* Resources */,
 				76B3A678A94F09CFAD7F0188 /* Embed Pods Frameworks */,
 				0037D4566BA6AD72378A8FD0 /* Copy Pods Resources */,
+				6286FBEA1C5784940000E7E6 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -175,6 +176,19 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Sociallite/Pods-Sociallite-resources.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		6286FBEA1C5784940000E7E6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" 6e2627e32b12fac30c5457be648f9e51df4497f7 cf4412fb16395d029c88f479b1679bc39bf3ca4f2742200ed0cb1dc5be05e40d";
 		};
 		76B3A678A94F09CFAD7F0188 /* Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
