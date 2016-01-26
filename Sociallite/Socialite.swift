@@ -244,13 +244,9 @@ extension NSError {
     convenience init(code: SLTShareErrorCode, userInfo: [NSObject: AnyObject]? = nil) {
         self.init(domain: SLTShareErrorDomain, code: code.rawValue, userInfo: userInfo)
     }
-
-    convenience init(userInfo: [NSObject: AnyObject]? = nil) {
-        self.init(domain: SLTShareErrorDomain, code: SLTShareErrorCode.Unknown.rawValue, userInfo: userInfo)
-    }
 }
 
-// This makes it easy to compare an `NSError.code` to an `shareErrorDomain`.
+// This makes it easy to compare an `NSError.code` to an `SLTShareErrorCode`.
 func ==(lhs: Int, rhs: SLTShareErrorCode) -> Bool {
     return lhs == rhs.rawValue
 }
@@ -273,7 +269,7 @@ protocol SLTShareProvider {
     
     var name : String  { get }
     ///Init the provider with its delegate Object
-    init(delegate : SLTShareProviderDelegate?)
+    init(withDelegate delegate : SLTShareProviderDelegate?)
 }
 
 ///Struct containing data returned after a successful share operation.
@@ -307,7 +303,9 @@ protocol SLTShareProviderDelegate: class {
 }
 
 ///A class Implements `FBSDKSharingDelegate's` delegate
-/// Since we cannot use Struct to be the `FBSDKSharingDelegate` delegate. That's mean the facebookShareProvider will have this class as a property and it will forward its delegate to this class. **Note:** we cannot use this class without setting its 'facebookShareProvider' property
+/// Since we cannot use Struct to be the `FBSDKSharingDelegate` delegate. That's mean the facebookShareProvider will have this class as a property and it will forward its delegate to this class. 
+///
+///**Note:** we cannot use this class without setting its 'facebookShareProvider' property
 class FBSDKSharingDelegateImpl:NSObject, FBSDKSharingDelegate {
 
     weak var delegate : SLTShareProviderDelegate?
@@ -364,7 +362,7 @@ struct SLTFacebookShareProvider : SLTShareProvider {
         self.sharingDelegateImpl = FBSDKSharingDelegateImpl(facebookShareProvider: self)
     }
     
-    init(delegate : SLTShareProviderDelegate?) {
+    init(withDelegate delegate: SLTShareProviderDelegate?) {
         
         self.init()
         self.sharingDelegateImpl.delegate = delegate
