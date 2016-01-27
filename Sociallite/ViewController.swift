@@ -23,6 +23,9 @@ class ViewController: UIViewController {
 //        let twitterSharer = SLTTwitterShareProvider(withDelegate: self)
         
 //        twitterSharer.share(self.view, text: "Test tweet")
+    
+        let facebook = SLTFacebookShareProvider(withDelegate: self)
+        facebook.shareMessengerText("test", url: NSURL(string: "http://www.google.com"), description: nil, imageURL: nil)
     }
 
 

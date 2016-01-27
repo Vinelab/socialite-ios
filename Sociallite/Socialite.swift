@@ -41,7 +41,9 @@ private struct SLTInternals : SLTFacebookPermission {
     
     //Providers name
     static let facebookProviderName = "facebook"
+    static let facebookMessengerProviderName = "facebookMessenger"
     static let twitterProviderName = "twitter"
+    static let whatsappProviderName = "whatsapp"
     
     static let providerNameKey = "providerName"
     static let UserStateKey = "State"
@@ -426,6 +428,15 @@ struct SLTFacebookShareProvider : SLTShareProvider {
     
 }
 
+extension SLTTwitterShareProvider {
+    
+    var name : String {
+        
+        return SLTInternals.twitterProviderName
+    }
+}
+
+
 struct SLTTwitterShareProvider  : SLTShareProvider {
     
     weak var delegate : SLTShareProviderDelegate?
@@ -463,10 +474,41 @@ struct SLTTwitterShareProvider  : SLTShareProvider {
     }
 }
 
-extension SLTTwitterShareProvider {
+struct SLTWhatsappShareProvider  : SLTShareProvider {
+
+    weak var delegate : SLTShareProviderDelegate?
+    
+    init(withDelegate delegate: SLTShareProviderDelegate?) {
+        
+        self.delegate = delegate
+    }
+
+    func share(text text:String) {
+        
+        if let url = NSURL(string: "whatsapp://send?text=" + text) {
+            
+            let application = UIApplication.sharedApplication()
+            
+            if application.canOpenURL(url) {
+                
+                application.openURL(url)
+                
+                delegate?.provider(self, didCompleteWithResults: SLTShareResult(postID: ""))
+                
+            } else {
+                
+                delegate?.provider(self, didFailWithError: NSError(code: SLTShareErrorCode.AppDoesntExist, userInfo: ["description" : "whatsapp doen't exist or the url is invalid"]))
+            }
+        }
+        
+    }
+    
+}
+
+extension SLTWhatsappShareProvider {
     
     var name : String {
         
-        return SLTInternals.twitterProviderName
+        return SLTInternals.whatsappProviderName
     }
 }
