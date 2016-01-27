@@ -10,6 +10,7 @@ import Foundation
 import FBSDKLoginKit
 import FBSDKShareKit
 import TwitterKit
+import MessageUI
 
 
 //FB login App Events and Notifications
@@ -44,6 +45,7 @@ private struct SLTInternals : SLTFacebookPermission {
     static let facebookMessengerProviderName = "facebookMessenger"
     static let twitterProviderName = "twitter"
     static let whatsappProviderName = "whatsapp"
+    static let emailProviderName = "email"
     
     static let providerNameKey = "providerName"
     static let UserStateKey = "State"
@@ -510,5 +512,115 @@ extension SLTWhatsappShareProvider {
     var name : String {
         
         return SLTInternals.whatsappProviderName
+    }
+}
+
+
+struct SLTEmailShareProvider  : SLTShareProvider {
+
+    weak var delegate : SLTShareProviderDelegate? {
+        
+        didSet {
+            //Forwoard delegation
+            emailShareProviderDelegateImpl.delegate = delegate
+        }
+    }
+    
+    var emailShareProviderDelegateImpl : SLTEmailShareProviderDelegateImpl!
+    
+    init(withDelegate delegate: SLTShareProviderDelegate?) {
+        
+        self.delegate = delegate
+        emailShareProviderDelegateImpl = SLTEmailShareProviderDelegateImpl(emailShareProvider: self)
+        emailShareProviderDelegateImpl.delegate = delegate
+    }
+
+    func share(button : UIView, title:String, url:NSURL) {
+        let mailComposeViewController = configuredMailComposeViewController(title:title , url:url)
+        
+        if MFMailComposeViewController.canSendMail() {
+        
+            if let controller = SLTInternals.viewControllerforView(button) {
+                
+                controller.presentViewController(mailComposeViewController, animated: true, completion: nil)
+            }
+            
+        } else {
+            
+            delegate?.provider(self, didFailWithError: NSError(code: SLTShareErrorCode.EmailNotAvailable, userInfo: ["description":"email service not available"]))
+        }
+    }
+    
+    func configuredMailComposeViewController(title title:String , url : NSURL) -> MFMailComposeViewController {
+        let mailComposerVC = MFMailComposeViewController()
+        mailComposerVC.mailComposeDelegate = self.emailShareProviderDelegateImpl
+        
+        mailComposerVC.setSubject("قرأت هذا في نجم")
+        
+        var body = title
+        body += "\n"
+        body += "\(url)"
+        body += "\n"
+        body += "يمكنك تحميل نجم من خلال الرابط التالي"
+        
+        mailComposerVC.setMessageBody( body, isHTML: false)
+        
+        return mailComposerVC
+    }
+}
+
+
+class SLTEmailShareProviderDelegateImpl:NSObject, MFMailComposeViewControllerDelegate {
+    
+    weak var delegate : SLTShareProviderDelegate?
+    var emailShareProvider : SLTEmailShareProvider
+
+    override init() {
+        
+        self.emailShareProvider = SLTEmailShareProvider(withDelegate: nil)
+        super.init()
+        fatalError("you cannot init FBSDKSharingDelegateImpl without Mail share provider use init:delegate instead")
+    }
+    
+    init(emailShareProvider:SLTEmailShareProvider) {
+        
+        self.emailShareProvider = emailShareProvider
+        super.init()
+    }
+    
+    func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
+        
+        switch result.rawValue {
+            
+        case MFMailComposeResultCancelled.rawValue:
+      
+            delegate?.providerDidCancel(emailShareProvider)
+        
+        case MFMailComposeResultSaved.rawValue:
+        
+            delegate?.provider(emailShareProvider, didCompleteWithResults: SLTShareResult(postID: ""))
+        
+        case MFMailComposeResultSent.rawValue:
+        
+            delegate?.provider(emailShareProvider, didCompleteWithResults: SLTShareResult(postID: ""))
+        
+        case MFMailComposeResultFailed.rawValue:
+            if let e = error {
+                delegate?.provider(emailShareProvider, didFailWithError: e)
+            }
+            
+        default:
+            if let e = error {
+                delegate?.provider(emailShareProvider, didFailWithError: e)
+            }
+        }
+    }
+}
+
+extension SLTEmailShareProvider {
+    
+    var name : String {
+        
+        return SLTInternals.emailProviderName
     }
 }
